@@ -5,3 +5,14 @@ Thumbs.db
 node_modules/
 dist/
 build/
+
+# C build artifacts
+bin/
+*.o
+*.obj
+*.exe
+*.out
+*.a
+*.so
+*.dll
+

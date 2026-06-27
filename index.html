@@ -53,6 +53,16 @@
   .price{display:flex;align-items:baseline;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 26px;margin-top:8px}
   .price .n{font-family:var(--serif);font-size:2.6rem;color:var(--accent);line-height:1}
   .price .l{color:var(--muted);font-size:.95rem}
+  .term{background:#0d1f14;border:1px solid #15402a;border-radius:14px;padding:0;margin-top:8px;overflow:hidden;box-shadow:0 10px 30px rgba(13,31,20,.18)}
+  .term .bar{display:flex;gap:7px;align-items:center;padding:11px 14px;background:#0a1810;border-bottom:1px solid #15402a}
+  .term .bar .dot{width:11px;height:11px;border-radius:50%}
+  .term .bar .dot.r{background:#ef6f6f}.term .bar .dot.y{background:#e6c15a}.term .bar .dot.g{background:#5ec97e}
+  .term .bar .ttl{margin-left:10px;font-family:var(--mono);font-size:.72rem;color:#7fae90;letter-spacing:.06em}
+  .term pre{margin:0;padding:18px 20px;font-family:var(--mono);font-size:.82rem;line-height:1.65;color:#d7efe0;overflow-x:auto;white-space:pre}
+  .term .c-sys{color:#7fae90}.term .c-join{color:#e6c15a}.term .c-msg{color:#9fe6b8}.term .c-prompt{color:#5ec97e}
+  .codeblock{background:#0d1f14;border:1px solid #15402a;border-radius:12px;padding:16px 20px;margin-top:8px;overflow-x:auto}
+  .codeblock pre{margin:0;font-family:var(--mono);font-size:.82rem;line-height:1.6;color:#d7efe0;white-space:pre}
+  .codeblock .c-prompt{color:#5ec97e}.codeblock .c-cmt{color:#7fae90}
   footer{padding:48px 0 80px}
   .credit{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px}
   .credit .k{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
@@ -118,8 +128,36 @@
 
 <section>
   <div class="wrap">
+    <p class="kicker">The real thing</p>
+    <h2>Two clients, one broadcast</h2>
+    <p>This is the actual end-to-end smoke test: it starts the C server, connects two separate client processes, and one client (<code>bob</code>) receives the message the other (<code>alice</code>) sends. The transcript below is bob's real terminal output — captured, not mocked.</p>
+    <div class="term">
+      <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="ttl">bob — client connected to 127.0.0.1:5555</span></div>
+<pre><span class="c-sys">* welcome to TerminalChat — type your nickname:</span>
+<span class="c-prompt">* you are now known as bob</span>
+<span class="c-join">* alice joined the chat</span>
+<span class="c-msg">alice: hello from alice</span>
+<span class="c-join">* alice left the chat</span></pre>
+    </div>
+    <p class="muted" style="margin-top:18px">The program is real C. Build it with <code>make</code> (or one <code>gcc</code> line), run the server, and point clients at it:</p>
+    <div class="codeblock">
+<pre><span class="c-cmt"># build everything (server, client, framing test)</span>
+<span class="c-prompt">$</span> make
+
+<span class="c-cmt"># terminal 1 — start the server</span>
+<span class="c-prompt">$</span> ./bin/server 5050
+
+<span class="c-cmt"># terminal 2 — join the chat</span>
+<span class="c-prompt">$</span> ./bin/client 127.0.0.1 5050</pre>
+    </div>
+    <p class="muted" style="margin-top:18px">It's portable: the same source builds on Windows (Winsock2, linked with <code>-lws2_32</code>) and on Linux/macOS (POSIX sockets), guarded by <code>#ifdef _WIN32</code>. A unit test on the message-framing functions reports <code>all 23 assertions passed</code>.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
     <p class="kicker">Reflection</p>
-    <h2>What rebuilding it taught me</h2>
+    <h2>What building it taught me</h2>
     <ul class="learn">
       <li><b>Sockets are just file descriptors.</b> The OS treats a network connection like a file you read and write — once that clicks, networking demystifies.</li>
       <li><b>Concurrency without threads.</b> A single <code>select()</code> loop handles many clients elegantly — the model behind the fastest servers.</li>
@@ -134,7 +172,7 @@
   <div class="wrap">
     <div class="credit">
       <div class="k">About this build</div>
-      <p style="margin:0">An original, from-scratch build by <b>Andrea</b> — written to learn systems and network programming in C: TCP sockets, a <code>select()</code>-based event loop, message broadcasting, manual buffers and robust disconnect handling. Plain HTML/CSS, deployed on GitHub Pages.</p>
+      <p style="margin:0">An original, from-scratch build by <b>Andrea</b> — a real terminal chat client and server written in C: TCP sockets, a <code>select()</code>-based event loop, newline-framed messages, broadcast, and robust disconnect handling, portable across Windows (Winsock2) and POSIX. The full source, a framing unit test and an end-to-end smoke test live in the repository; this page is a single self-contained HTML file describing it, deployed on GitHub Pages.</p>
     </div>
     <p class="fine">Built from scratch by Andrea · one of an ongoing series of learning builds.</p>
   </div>
